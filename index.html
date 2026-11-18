@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados Clima Organizacional</title>
+    <!-- Librerías para leer CSV y crear gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; background: #f9fafb; color: #1f2937; }
+        .card { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        h1 { font-size: 1.5rem; margin-bottom: 8px; }
+        p { color: #6b7280; margin-bottom: 24px; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>Encuesta de Clima Organizacional</h1>
+        <p>Visualización de resultados del equipo</p>
+        <canvas id="miGrafico"></canvas>
+    </div>
+Encuesta clima organizacional Univalle (respuestas) - Respuestas de formulario 1.csv
+    <script>
+        // 1. IMPORTANTE: Cambia este nombre por el nombre exacto de tu archivo CSV en GitHub
+        const archivoCSV = 'Encuesta clima organizacional Univalle (respuestas) - Respuestas de formulario 1.csv'; 
+
+        // 2. IMPORTANTE: Cambia esto por el nombre exacto de la columna que quieres graficar (ej. una pregunta)
+        const columnaAGraficar = '1.Mi entorno laboral actual dentro de la dependencia favorece activamente mi desarrollo personal y profesional.'; 
+
+        Papa.parse(archivoCSV, {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function(resultados) {
+                const datos = resultados.data;
+                const conteoRespuestas = {};
+
+                // Contar cuántas veces se repite cada respuesta en esa columna
+                datos.forEach(fila => {
+                    const respuesta = fila[columnaAGraficar];
+                    if (respuesta) {
+                        conteoRespuestas[respuesta] = (conteoRespuestas[respuesta] || 0) + 1;
+                    }
+                });
+
+                // Dibujar el gráfico
+                const ctx = document.getElementById('miGrafico').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar', // Puedes cambiar 'bar' por 'pie' o 'doughnut'
+                    data: {
+                        labels: Object.keys(conteoRespuestas),
+                        datasets: [{
+                            label: 'Cantidad de respuestas',
+                            data: Object.values(conteoRespuestas),
+                            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
